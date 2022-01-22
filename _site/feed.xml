@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blog</title>
+    <description>Dicas, artigos e muita coisa bacana sobre Spring e Java de dev pra dev.</description>
+    <link>http://localhost:4000/index/</link>
+    <atom:link href="http://localhost:4000/index/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sat, 22 Jan 2022 18:51:04 -0300</pubDate>
+    <lastBuildDate>Sat, 22 Jan 2022 18:51:04 -0300</lastBuildDate>
+    <generator>Jekyll v3.8.5</generator>
+    
+      <item>
+        <title>@RepositoryRestResource - Entendendo o uso dessa annotation</title>
+        <description>&lt;p&gt;Neste artigo iremos trocar uma ideia sobre annotation @RepositoryRestResource, por meio dela podemos criar API HATEOAS em poucos minutos!&lt;/p&gt;
+
+&lt;p&gt;Em um cenário comum, considerando uma aplicação Spring Boot, temos a nossa camada de repositório que no caso é uma interface que estenderia do JpaRepository, uma camada de serviço e no controlador e retornando algumas ações, nesse ponto nada fora do padrão.&lt;/p&gt;
+
+&lt;h3 id=&quot;sobre-repositoryrestsource&quot;&gt;Sobre @RepositoryRestSource&lt;/h3&gt;
+
+&lt;p&gt;Na prática, o que  Spring fez aqui, é que permite que você exponha os seus endpoints por meio das suas interfaces (repositórios) são geralmente chamadas GET/POST/PUT e outros verbos HTTP para manipular a sua entidade. Uma das vantagens dessa annotation é que dispensa a necessidade de criar a camada de serviço e controladores. Uma das vantagens é que será criado seguindo a restrição HATEOAS, onde os clientes poderão facilmente consumir a sua API.&lt;/p&gt;
+
+&lt;p&gt;Ao anotar a nossa interface de repositório com @RepositoryRestResource , precisamos informar mais dois parâmetros, sendo eles :&lt;/p&gt;
+
+&lt;p&gt;A) Path : Indica qual o recurso importado, no nosso exemplo corresponderá ao path da aplicação, no nosso cenário/cliente&lt;/p&gt;
+
+&lt;h3 id=&quot;exemplo-prático&quot;&gt;Exemplo prático&lt;/h3&gt;
+
+&lt;p&gt;O modelo criado é referenciado como CustomerRepository e Customer, onde o CustomerRepository é composto por uma interface usando a annotation @RepositoryRestResource, conforme o exemplo abaixo:&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/112ad35ce6ab5ddb869eacbb6bcafc73.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;A classe Customer representa o nosso modelo de negócio.&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/8e111550c19541e641ad6e9c57191607.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Ao subir a aplicação e acessar o path &lt;code class=&quot;highlighter-rouge&quot;&gt;localhost:8080/customer&lt;/code&gt; nos deparamos com o seguinte retorno:&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/f6384c323a45cd978a05a20d7d027091.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;E voilà em questão de minutos montamos a nossa API seguindo o padrão HATEOAS seguindo uma série de especificações, como, por exemplo a RFC 5988 que define como os links deverão ser implementados.&lt;/p&gt;
+
+&lt;p&gt;Podemos confirmar o funcionamento de alguns endpoints pelos testes de integração abaixo:&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/43165e9b53292171def2aa7013e91b63.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Usar essa categoria de abordagem possui uma série de benefícios para quem for utilizá-la, onde com poucas linhas de códigos poderá criar uma API, evita o trabalho de criar a camada de serviços e controladores além de permitir o desenvolvimento de testes de integração. Algumas desvantagens do uso dessa annotation é a falta de controle sobre a criação/retorno de status codes e headers.&lt;/p&gt;
+
+&lt;h3 id=&quot;encerramento&quot;&gt;Encerramento&lt;/h3&gt;
+
+&lt;p&gt;Foi apresentado a annotation RepositoryRestResource, ela fornece a oportunidade de expormos facilmente os nossos endpoints usando somente a camada de repositório, evitando a criação dos Controllers. Você poderá avaliar o seu uso nos seus projetos para otimizar tempo e trabalho na criação de APIs.&lt;/p&gt;
+
+&lt;p&gt;Ps. Ela é importada do pacote &lt;code class=&quot;highlighter-rouge&quot;&gt;spring-boot-starter-data-rest&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;código-fonte&quot;&gt;Código fonte&lt;/h3&gt;
+
+&lt;p&gt;O código fonte está disponibilizado &lt;a href=&quot;https://github.com/httpmurilo/artigo-repository-rest-resource&quot;&gt;aqui&lt;/a&gt;.&lt;/p&gt;
+</description>
+        <pubDate>Sat, 22 Jan 2022 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/index/repository-rest-resource/</link>
+        <guid isPermaLink="true">http://localhost:4000/index/repository-rest-resource/</guid>
+        
+        
+        <category>springboot</category>
+        
+        <category>annotations</category>
+        
+      </item>
+    
+  </channel>
+</rss>
