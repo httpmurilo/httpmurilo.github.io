@@ -3,11 +3,193 @@
   <channel>
     <title>Blog</title>
     <description>Dicas, artigos e muita coisa bacana sobre Spring e Java de dev pra dev.</description>
-    <link>http://localhost:4000/index/</link>
-    <atom:link href="http://localhost:4000/index/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 22 Jan 2022 18:51:04 -0300</pubDate>
-    <lastBuildDate>Sat, 22 Jan 2022 18:51:04 -0300</lastBuildDate>
-    <generator>Jekyll v3.8.5</generator>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 02 Apr 2024 22:11:02 -0300</pubDate>
+    <lastBuildDate>Tue, 02 Apr 2024 22:11:02 -0300</lastBuildDate>
+    <generator>Jekyll v4.3.3</generator>
+    
+      <item>
+        <title>Vulnerabilidade de injection de SQL no Spring</title>
+        <description>&lt;p&gt;Entre as várias ameaças à segurança, a injeção de consultas emerge como uma das vulnerabilidades mais comuns e perigosas enfrentadas por sistemas online. Neste artigo, exploraremos em detalhes a vulnerabilidade de injeção de consultas, com foco especial em como ela afeta aplicações desenvolvidas com o framework Spring.&lt;/p&gt;
+
+&lt;p&gt;Começaremos definindo o que é a injeção de consultas e como ela pode ser explorada por invasores para comprometer a integridade e a segurança dos dados de uma aplicação. Em seguida, examinaremos diferentes cenários de injeção de consultas em interfaces e consultas anotadas com @Query e nativeQuery = true em aplicações Spring.&lt;/p&gt;
+
+&lt;p&gt;Além disso, discutiremos as melhores práticas para prevenir e mitigar essas vulnerabilidades, destacando o uso de consultas parametrizadas, frameworks de segurança e outras técnicas de proteção.&lt;/p&gt;
+
+&lt;p&gt;Disclaimer: Artigo foi criado e adaptado com base na cartilha OWASP Top 10 - 2017 The Ten Most Critical Web Application Security Risks, a consulta original pode ser feita &lt;a href=&quot;https://owasp.org/www-pdf-archive/OWASP_Top_10-2017_%28en%29.pdf.pdf&quot;&gt;aqui&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;sobre-a-vulnerabilidade&quot;&gt;Sobre a vulnerabilidade&lt;/h3&gt;
+
+&lt;p&gt;A documentação original menciona que As falhas de injeção, como injeção de SQL, NoSQL, SO e LDAP, ocorrem quando dados não confiáveis são enviados a um intérprete como parte de um comando ou consulta. Esse conceito se aplica a uma ampla variedade de sistemas e tecnologias, incluindo bancos de dados relacionais, bancos de dados NoSQL, sistemas operacionais e serviços de diretório LDAP.&lt;/p&gt;
+
+&lt;p&gt;Vamos decorrer um pouco sobre o tema: as vulnerabilidades de injeções representam uma ameaça significativa em sistemas web e aplicativos, especialmente aqueles que interagem com bancos de dados. Essas falhas ocorrem quando os dados fornecidos pelo usuário são inseridos diretamente em uma consulta ou comando executado por um sistema. Isso pode acontecer em vários contextos, como a construção de uma consulta SQL dinâmica, a montagem de uma string de comandos em um sistema operacional, ou até mesmo a criação de uma consulta LDAP.&lt;/p&gt;
+
+&lt;p&gt;O perigo reside no fato de que, se os dados do usuário não forem adequadamente tratados ou sanitizados, um invasor pode manipulá-los de forma maliciosa, inserindo caracteres especiais ou instruções que alteram o comportamento esperado do sistema. Isso pode levar a uma variedade de ataques, desde a recuperação não autorizada de informações confidenciais até a execução de comandos indesejados no sistema.&lt;/p&gt;
+
+&lt;p&gt;É importante ressaltar que essas vulnerabilidades são especialmente prevalentes em cenários onde há concatenação de strings para formar consultas ou comandos. Esse método de construção de consultas é propenso a erros devido à natureza dinâmica e imprevisível dos dados fornecidos pelos usuários.&lt;/p&gt;
+
+&lt;p&gt;Ao entender as vulnerabilidades de injeção de consultas e os riscos associados, os desenvolvedores podem adotar práticas seguras de codificação e implementar medidas de segurança adequadas para proteger seus sistemas contra essas ameaças.&lt;/p&gt;
+
+&lt;h3 id=&quot;exemplo-prático&quot;&gt;Exemplo prático&lt;/h3&gt;
+
+&lt;p&gt;Para este exemplo, vamos imaginar uma API usando Spring Boot onde ela recebe um objeto por meio do corpo da requisição. A classe abaixo representa a nosso controlador.&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/e7f29bfb97a7284b8ed1cc6fbec000be.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Temos uma classe que representa a entidade do banco de dados, a classe &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;User&lt;/code&gt; contém algumas propriedades que facilmente podemos achar em ambientes de produção, pré-prod, homologação e assim por diante.&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/85efcca52da7953b48a8f1f7046dbc75.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;No repositório, temos a seguinte lógica, onde recebemos o nome do usuário e realizamos a busca, a consulta foi montada em JHQL, nela incluímos uma concatenação desnecessária, o uso das &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&apos;&apos;&lt;/code&gt; não é necessário pois o JPA consegue interpretar o valor &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;?1&lt;/code&gt;:&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/f37551991cae80fb6479312c833ac470.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Atualmente as informações são obtidas conforme request &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://localhost:8080/api/user/search?name=Pedro&lt;/code&gt;, onde o critério de busca vem por meio da QueryString.&lt;/p&gt;
+
+&lt;p&gt;Paralelamente, foi criado um console application onde injetará mais de mil string maliciosas:&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/e744e3b096d695e92c4253b33830d882.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Após o teste de estresse, as consultas montadas mantiveram o padrão, de forma nativa o spring conseguiu sanitizar todos os ataques.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Hibernate:
+    /* dynamic native SQL query */ SELECT
+        *
+    FROM
+        User
+    WHERE
+        name = &apos;?1&apos;
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Vamos trocar uma ideia sobre esse comportamento;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Por padrão, o &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;tomcat-embed-core&lt;/code&gt; já bloqueia cenários mínimos de ataques, com a mensagem &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Invalid character found in the HTTP protocol [&apos; ]&lt;/code&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Ao usar o JpaRepository, as consultas são tratadas automaticamente para evitar vulnerabilidades de injeção de SQL. Significando que as consultas são parametrizadas por padrão.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Em outras palavras, isso significa que os parâmetros são tratados separadamente da consulta SQL e não são concatenados diretamente na consulta. Assim protege contra a maioria dos ataques de injeção de SQL, pois os valores dos parâmetros não são interpretados como parte do comando SQL. A partir do momento que usamos ela, o Spring Data JPA já realiza esse tratamento para nós.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;O tratamento automático introduziu essas funcionalidades de segurança desde suas primeiras versões, e desde então vem se aprimorando vide os bugs aberto pela comunidade (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;https://spring.io/security/cve-2016-6652&lt;/code&gt;).&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Sobre o uso do @RequestParam no controladores Spring, ao não adotá-lo, a request vai bater no repositório como &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&apos;=&quot;or&apos;&lt;/code&gt;. A partir do momento que adotar o seu uso, o comportamento é o mesmo. Como uma alternativa, pode ser usado &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;StringEscapeUtils.escapeSql()&lt;/code&gt; do pacote &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Apache Commons Lang&lt;/code&gt;. Pode ser consultado em &lt;a href=&quot;https://mvnrepository.com/artifact/org.apache.commons/commons-lang3&quot;&gt;commons-lang3&lt;/a&gt;.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Sobre o uso do @Param em consultas JPA, honestamente, se voltarmos para o início da lista, veremos que ele não é obrigatório/necessário, creio que o uso dele visá tornar o código mais legível ou para manter uma consistência entre os diferentes métodos de consulta, fica a gosto do cliente o seu uso.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;encerramento&quot;&gt;Encerramento&lt;/h3&gt;
+
+&lt;p&gt;A injeção de consultas, como a injeção de SQL, representa uma ameaça significativa à segurança das aplicações web. Essas falhas ocorrem quando dados não confiáveis são inseridos em um sistema e interpretados como parte de um comando ou consulta. Isso pode levar a ações não intencionadas, como acesso não autorizado a dados ou até mesmo corrupção de dados.&lt;/p&gt;
+
+&lt;p&gt;No contexto do Spring Data JPA, descobrimos que o tratamento automático de consultas introduzido desde suas primeiras versões protege efetivamente contra a maioria dos ataques de injeção de SQL. Consultas parametrizadas são usadas por padrão, o que separa os parâmetros da consulta SQL e evita a interpretação de dados de entrada como parte do comando SQL.&lt;/p&gt;
+
+&lt;p&gt;Em resumo, é crucial estar ciente das vulnerabilidades de injeção de consultas e implementar medidas adequadas para mitigar esses riscos, garantindo assim a segurança e integridade de suas aplicações web.&lt;/p&gt;
+
+&lt;h3 id=&quot;código-fonte&quot;&gt;Código fonte&lt;/h3&gt;
+
+&lt;p&gt;O código fonte está disponibilizado &lt;a href=&quot;https://github.com/httpmurilo/basic-injection-example&quot;&gt;aqui&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;A lista de sql injection pode ser consulta &lt;a href=&quot;https://gist.github.com/httpmurilo/4579669be1d2e562eb82a0b7e0fd8424&quot;&gt;aqui&lt;/a&gt;, deixando claro os seus créditos aos autores &lt;a href=&quot;https://swisskyrepo.github.io/PayloadsAllTheThingsWeb/SQL%20Injection/&quot;&gt;swissky&lt;/a&gt; e &lt;a href=&quot;https://github.com/payloadbox&quot;&gt;payloadbox&lt;/a&gt;.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 02 Apr 2024 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/owasp-spring-pratica/</link>
+        <guid isPermaLink="true">http://localhost:4000/owasp-spring-pratica/</guid>
+        
+        
+        <category>springboot</category>
+        
+        <category>owasp</category>
+        
+      </item>
+    
+      <item>
+        <title>Map Struct - Criando objetos DTOs de forma mais elegante</title>
+        <description>&lt;p&gt;Neste artigo será apresentado a biblioteca Map Struct que permite criar objetos dtos e serializa-los de forma mais elegante, simples e prática.&lt;/p&gt;
+
+&lt;p&gt;Data Transfer Object, comumente conhecido como DTO é um padrão de projetos muito utilizado em várias linguagens de programação. É destinado para o transporte de dados entre diferentes camadas do sistema. A proposta é possuir uma classe mais simples e leve para melhorar a comunicação e otimizar o processamento.&lt;/p&gt;
+
+&lt;h3 id=&quot;sobre-sua-aplicabilidade&quot;&gt;Sobre sua aplicabilidade&lt;/h3&gt;
+
+&lt;p&gt;O padrão DTO, resolver vários problemas, um deles é onde possuirmos o cadastro de uma entidade, mas algumas informações não necessariamente são obrigatórias ou necessárias, nesse caso, podemos criar uma classe secundária onde tenha os campos necessários e depois realizarmos a conversão/mapeamento para a entidade. Se procurarmos algum exemplo especificamente com Java, nos deparamos com os seguintes exemplos. Onde existe uma classe DTO e dentro dela, temos um construtor fazendo o de-para.&lt;/p&gt;
+
+&lt;h3 id=&quot;exemplo-prático&quot;&gt;Exemplo prático&lt;/h3&gt;
+
+&lt;p&gt;Para este exemplo, vamos imaginar que o nosso sistema é composto por uma tela de um sistema de cadastro de usuários, no módulo de cadastro de usuário, certos campos não são obrigatórios no envio da requisição. A classe abaixo representa a entidade User.&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/3a35ab40250072200914639e81b58498.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Contudo, o sistema não necessita que no momento de criação seja informado o id do cliente e se o usuário está ativo ou não, para isso criamos um DTO, um objeto mais simples para representar o nosso cadastro. A classe abaixo representa o nosso UserDTO.&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/3e8ccddff78e2e0694d4152d743fd649.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Bom, na teoria, o nosso DTO está funcional e atendendo a necessidade de cadastro de usuários, mas em uma ensolarada manhã, a necessidade do cliente muda e o Product Owner chega na sua mesa informando que nesta tela, onde temos o cadastro de usuário torna-se necessário informar mais informações do cliente, como número do pedido, cidade e estado.&lt;/p&gt;
+
+&lt;p&gt;Agora temos um cenário onde toda e qualquer alteração precisa incrementar o nosso construtor &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserDTO convertToUser(User user)&lt;/code&gt;. Nesse cenário, temos seis propriedades, até aí tudo bem. Mas se considerarmos, a tendência do software de ir mudando a necessidade da tela de cadastro de usuário ficará muito inviável manter esse construtor, pois ele não irá parar de crescer ferido o princípio SOLID Open-closed principle, onde define que uma entidade deverá estar aberta para extensão, mas fechada para modificação.&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/d296cc8f2f539541798aeb4ac827df40.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Nessa parte que entra a lib &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MapStruct&lt;/code&gt;, a proposta dela é simplificar a implementação de mapeamento entre tipos. É rápido, seguro e fácil de implementar e entender. A utilização e serialização de DTO/Entidades é simplificada com o uso dessa dependência.&lt;/p&gt;
+
+&lt;p&gt;Para iniciar a implementação, é necessário importa-la ao projeto na &lt;a href=&quot;https://mapstruct.org/documentation/installation/&quot;&gt;documentação oficial&lt;/a&gt; é demostrado essa inclusão;&lt;/p&gt;
+
+&lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;table class=&quot;rouge-table&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td class=&quot;rouge-gutter gl&quot;&gt;&lt;pre class=&quot;lineno&quot;&gt;1
+2
+3
+4
+5
+6
+7
+&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;rouge-code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;err&quot;&gt;dependencies&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;err&quot;&gt;...&lt;/span&gt;
+    &lt;span class=&quot;err&quot;&gt;implementation&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;org.mapstruct&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;mapstruct:1.4.2.Final&apos;&lt;/span&gt;
+ 
+    &lt;span class=&quot;err&quot;&gt;annotationProcessor&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;&apos;&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;org.mapstruct&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;mapstruct-processor:1.4.2.Final&apos;&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;}&lt;/span&gt;
+
+&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Uma abordagem que particularmente eu curto é a utilização de &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;static factory method&lt;/code&gt; juntamente com uma classe &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;abstract&lt;/code&gt;, onde a conversão ficaria da seguinte forma;&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/8d651463987e9cf73daf19af9940e8c1.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Assim a nossa classe de serviço terá uma única instância do Mapper e a leitura fica bem mais agradável;&lt;/p&gt;
+
+&lt;script src=&quot;https://gist.github.com/httpmurilo/32b134fef6e8a29565dd8aee76720c5d.js&quot;&gt;&lt;/script&gt;
+
+&lt;p&gt;Essa implementação pode ser utilizada em várias camadas e tornará esse tipo de conversão muito fácil.&lt;/p&gt;
+
+&lt;h3 id=&quot;encerramento&quot;&gt;Encerramento&lt;/h3&gt;
+
+&lt;p&gt;Foi apresentado a utilização do &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MapStruct&lt;/code&gt; para mapeamento de DTOs com o uso de &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;static factory method&lt;/code&gt;. Com essa abordagem, se surgir a necessidade de aumentar as propriedades da nossa tela de cadastro basta incluir as propriedades nas classes &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;User&lt;/code&gt; e &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;UserDTO&lt;/code&gt;. O construtor que poderia se tornar um godzilla já não existe nessa cenário. Ficando mais limpa e prática.&lt;/p&gt;
+
+&lt;p&gt;Na sequência, abordaremos um comparativo entre &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MapStruct&lt;/code&gt; e a biblioteca &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ModelMapper&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;código-fonte&quot;&gt;Código fonte&lt;/h3&gt;
+
+&lt;p&gt;O código fonte está disponibilizado &lt;a href=&quot;https://github.com/httpmurilo/basic-map-struct&quot;&gt;aqui&lt;/a&gt;.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 11 Feb 2022 00:00:00 -0300</pubDate>
+        <link>http://localhost:4000/mapstruct-criando-dto-de-forma-mais-elegante/</link>
+        <guid isPermaLink="true">http://localhost:4000/mapstruct-criando-dto-de-forma-mais-elegante/</guid>
+        
+        
+        <category>springboot</category>
+        
+        <category>mapstruct</category>
+        
+        <category>dto</category>
+        
+      </item>
     
       <item>
         <title>@RepositoryRestResource - Entendendo o uso dessa annotation</title>
@@ -33,7 +215,7 @@
 
 &lt;script src=&quot;https://gist.github.com/httpmurilo/8e111550c19541e641ad6e9c57191607.js&quot;&gt;&lt;/script&gt;
 
-&lt;p&gt;Ao subir a aplicação e acessar o path &lt;code class=&quot;highlighter-rouge&quot;&gt;localhost:8080/customer&lt;/code&gt; nos deparamos com o seguinte retorno:&lt;/p&gt;
+&lt;p&gt;Ao subir a aplicação e acessar o path &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;localhost:8080/customer&lt;/code&gt; nos deparamos com o seguinte retorno:&lt;/p&gt;
 
 &lt;script src=&quot;https://gist.github.com/httpmurilo/f6384c323a45cd978a05a20d7d027091.js&quot;&gt;&lt;/script&gt;
 
@@ -49,15 +231,15 @@
 
 &lt;p&gt;Foi apresentado a annotation RepositoryRestResource, ela fornece a oportunidade de expormos facilmente os nossos endpoints usando somente a camada de repositório, evitando a criação dos Controllers. Você poderá avaliar o seu uso nos seus projetos para otimizar tempo e trabalho na criação de APIs.&lt;/p&gt;
 
-&lt;p&gt;Ps. Ela é importada do pacote &lt;code class=&quot;highlighter-rouge&quot;&gt;spring-boot-starter-data-rest&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Ps. Ela é importada do pacote &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;spring-boot-starter-data-rest&lt;/code&gt;.&lt;/p&gt;
 
 &lt;h3 id=&quot;código-fonte&quot;&gt;Código fonte&lt;/h3&gt;
 
 &lt;p&gt;O código fonte está disponibilizado &lt;a href=&quot;https://github.com/httpmurilo/artigo-repository-rest-resource&quot;&gt;aqui&lt;/a&gt;.&lt;/p&gt;
 </description>
         <pubDate>Sat, 22 Jan 2022 00:00:00 -0300</pubDate>
-        <link>http://localhost:4000/index/repository-rest-resource/</link>
-        <guid isPermaLink="true">http://localhost:4000/index/repository-rest-resource/</guid>
+        <link>http://localhost:4000/repository-rest-resource/</link>
+        <guid isPermaLink="true">http://localhost:4000/repository-rest-resource/</guid>
         
         
         <category>springboot</category>

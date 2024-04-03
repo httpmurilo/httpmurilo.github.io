@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<link rel="icon" href="/assets/images/logo.png">
+
+<title>Vulnerabilidade de injection de SQL no Spring | Murilo Eduardo</title>
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Vulnerabilidade de injection de SQL no Spring | Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="Vulnerabilidade de injection de SQL no Spring" />
+<meta name="author" content="murilo" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Entre as várias ameaças à segurança, a injeção de consultas emerge como uma das vulnerabilidades mais comuns e perigosas enfrentadas por sistemas online. Neste artigo, exploraremos em detalhes a vulnerabilidade de injeção de consultas, com foco especial em como ela afeta aplicações desenvolvidas com o framework Spring." />
+<meta property="og:description" content="Entre as várias ameaças à segurança, a injeção de consultas emerge como uma das vulnerabilidades mais comuns e perigosas enfrentadas por sistemas online. Neste artigo, exploraremos em detalhes a vulnerabilidade de injeção de consultas, com foco especial em como ela afeta aplicações desenvolvidas com o framework Spring." />
+<link rel="canonical" href="http://localhost:4000/owasp-spring-pratica/" />
+<meta property="og:url" content="http://localhost:4000/owasp-spring-pratica/" />
+<meta property="og:site_name" content="Blog" />
+<meta property="og:image" content="http://localhost:4000/assets/images/sql-injection.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-04-02T00:00:00-03:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta property="twitter:image" content="http://localhost:4000/assets/images/sql-injection.png" />
+<meta property="twitter:title" content="Vulnerabilidade de injection de SQL no Spring" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"murilo"},"dateModified":"2024-04-02T00:00:00-03:00","datePublished":"2024-04-02T00:00:00-03:00","description":"Entre as várias ameaças à segurança, a injeção de consultas emerge como uma das vulnerabilidades mais comuns e perigosas enfrentadas por sistemas online. Neste artigo, exploraremos em detalhes a vulnerabilidade de injeção de consultas, com foco especial em como ela afeta aplicações desenvolvidas com o framework Spring.","headline":"Vulnerabilidade de injection de SQL no Spring","image":"http://localhost:4000/assets/images/sql-injection.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/owasp-spring-pratica/"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/logo.png"},"name":"murilo"},"url":"http://localhost:4000/owasp-spring-pratica/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    
+<link href="/assets/css/screen.css" rel="stylesheet">
+
+<link href="/assets/css/main.css" rel="stylesheet">
+
+<script src="/assets/js/jquery.min.js"></script>
+
+</head>
+
+
+
+
+<body class="layout-post">
+	<!-- defer loading of font and font awesome -->
+	<noscript id="deferred-styles">
+		<link href="https://fonts.googleapis.com/css?family=Righteous%7CMerriweather:300,300i,400,400i,700,700i" rel="stylesheet">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+	</noscript>
+
+
+<!-- Begin Menu Navigation
+================================================== -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top mediumnavigation nav-down">
+
+    <div class="container pr-0">
+
+    <!-- Begin Logo -->
+    <a class="navbar-brand" href="/">
+    <img src="/assets/images/logo.png" alt="Murilo Eduardo">
+    </a>
+    <!-- End Logo -->
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMediumish" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarMediumish">
+
+        <!-- Begin Menu -->
+
+            <ul class="navbar-nav ml-auto">
+
+                
+                <li class="nav-item">
+                
+                <a class="nav-link" href="/index.html">Blog</a>
+                </li>
+
+                <li class="nav-item">
+                <a class="nav-link" href="/about">Sobre</a>
+                </li>
+
+
+                <!-- <li class="nav-item">
+                <a target="_blank" class="nav-link" href="https://www.wowthemes.net/themes/mediumish-wordpress/"><i class="fab fa-wordpress-simple"></i> WP Version</a>
+                </li>
+
+                <li class="nav-item">
+                <a target="_blank" class="nav-link" href="https://www.wowthemes.net/themes/mediumish-ghost/"><i class="fab fa-snapchat-ghost"></i> Ghost Version</a>
+                </li>
+
+                <li class="nav-item">
+                <a target="_blank" class="nav-link" href="https://github.com/wowthemesnet/mediumish-theme-jekyll"><i class="fab fa-github"></i> Fork on Github</a>
+                </li> -->
+
+                <script src="/assets/js/lunr.js"></script>
+
+
+<style>
+    .lunrsearchresult .title {color: #d9230f;}
+    .lunrsearchresult .url {color: silver;}
+    .lunrsearchresult a {display: block; color: #777;}
+    .lunrsearchresult a:hover, .lunrsearchresult a:focus {text-decoration: none;}
+    .lunrsearchresult a:hover .title {text-decoration: underline;}
+</style>
+
+
+<form class="bd-search" onSubmit="return lunr_search(document.getElementById('lunrsearch').value);">
+    <input type="text" class="form-control text-small launch-modal-search" id="lunrsearch" name="q" maxlength="255" value="" placeholder="Type and enter..."/>
+</form>
+
+<div id="lunrsearchresults">
+    <ul></ul>
+</div>
+
+<script src="/assets/js/lunrsearchengine.js"></script>
+
+            </ul>
+
+        <!-- End Menu -->
+
+    </div>
+
+    </div>
+</nav>
+<!-- End Navigation
+================================================== -->
+
+<div class="site-content">
+
+<div class="container">
+
+<!-- Site Title
+================================================== -->
+<div class="mainheading">
+    <h1 class="sitetitle">Murilo Eduardo</h1>
+    <p class="lead">
+        Dicas, artigos e muita coisa bacana sobre Spring e Java de dev pra dev.
+    </p>
+</div>
+
+<!-- Content
+================================================== -->
+<div class="main-content">
+    <!-- Begin Article
+================================================== -->
+<div class="container">
+    <div class="row">
+
+        <!-- Post Share -->
+        <div class="col-md-2 pl-0">
+            <div class="share sticky-top sticky-top-offset">
+    <p>
+        Share
+    </p>
+    <ul>
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=Vulnerabilidade de injection de SQL no Spring&url=http://localhost:4000/owasp-spring-pratica/" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://facebook.com/sharer.php?u=http://localhost:4000/owasp-spring-pratica/" onclick="window.open(this.href, 'facebook-share', 'width=550,height=435');return false;">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+        </li>
+
+        <li class="ml-1 mr-1">
+            <a target="_blank" href="https://www.linkedin.com/shareArticle?mini=true&url=http://localhost:4000/owasp-spring-pratica/" onclick="window.open(this.href, 'width=550,height=435');return false;">
+                <i class="fab fa-linkedin-in"></i>
+            </a>
+        </li>
+
+    </ul>
+    
+    <div class="sep">
+    </div>
+    <ul>
+        <li>
+        <a class="small smoothscroll" href="#disqus_thread"></a>
+        </li>
+    </ul>
+    
+</div>
+
+        </div>
+
+        <!-- Post -->
+        
+
+        <div class="col-md-9 flex-first flex-md-unordered">
+            <div class="mainheading">
+
+                <!-- Author Box -->
+                
+                <div class="row post-top-meta">
+                    <div class="col-xs-12 col-md-3 col-lg-2 text-center text-md-left mb-4 mb-md-0">
+                        
+                        <img class="author-thumb" src="https://www.gravatar.com/avatar/02eb5ac32770f59aa91ddf2fab3e51f4?s=250&d=mm&r=x" alt="Murilo Eduardo">
+                        
+                    </div>
+                    <div class="col-xs-12 col-md-9 col-lg-10 text-center text-md-left">
+                        <a target="_blank" class="link-dark" href="http://4solut.com.br">Murilo Eduardo</a><a target="_blank" href="http://4solut.com.br" class="btn follow">Follow</a>
+                        <span class="author-description">Crossfiteiro, entusiastas de tecnologias e amante de novas tendências de softwares. Não dispenso uma cervejinha e um bom livro.</span>
+                    </div>
+                </div>
+                
+
+                <!-- Post Title -->
+                <h1 class="posttitle">Vulnerabilidade de injection de SQL no Spring</h1>
+
+            </div>
+
+            <!-- Adsense if enabled from _config.yml (change your pub id and slot) -->
+            
+            <!-- End Adsense -->
+
+            <!-- Post Featured Image -->
+            
+
+            
+            <img class="featured-image img-fluid" src="/assets/images/sql-injection.png" alt="Vulnerabilidade de injection de SQL no Spring">
+            
+
+            
+            <!-- End Featured Image -->
+
+            <!-- Post Content -->
+            <div class="article-post">
+                <!-- Toc if any -->
+                
+                <!-- End Toc -->
+                <p>Entre as várias ameaças à segurança, a injeção de consultas emerge como uma das vulnerabilidades mais comuns e perigosas enfrentadas por sistemas online. Neste artigo, exploraremos em detalhes a vulnerabilidade de injeção de consultas, com foco especial em como ela afeta aplicações desenvolvidas com o framework Spring.</p>
+
+<p>Começaremos definindo o que é a injeção de consultas e como ela pode ser explorada por invasores para comprometer a integridade e a segurança dos dados de uma aplicação. Em seguida, examinaremos diferentes cenários de injeção de consultas em interfaces e consultas anotadas com @Query e nativeQuery = true em aplicações Spring.</p>
+
+<p>Além disso, discutiremos as melhores práticas para prevenir e mitigar essas vulnerabilidades, destacando o uso de consultas parametrizadas, frameworks de segurança e outras técnicas de proteção.</p>
+
+<p>Disclaimer: Artigo foi criado e adaptado com base na cartilha OWASP Top 10 - 2017 The Ten Most Critical Web Application Security Risks, a consulta original pode ser feita <a href="https://owasp.org/www-pdf-archive/OWASP_Top_10-2017_%28en%29.pdf.pdf">aqui</a>.</p>
+
+<h3 id="sobre-a-vulnerabilidade">Sobre a vulnerabilidade</h3>
+
+<p>A documentação original menciona que As falhas de injeção, como injeção de SQL, NoSQL, SO e LDAP, ocorrem quando dados não confiáveis são enviados a um intérprete como parte de um comando ou consulta. Esse conceito se aplica a uma ampla variedade de sistemas e tecnologias, incluindo bancos de dados relacionais, bancos de dados NoSQL, sistemas operacionais e serviços de diretório LDAP.</p>
+
+<p>Vamos decorrer um pouco sobre o tema: as vulnerabilidades de injeções representam uma ameaça significativa em sistemas web e aplicativos, especialmente aqueles que interagem com bancos de dados. Essas falhas ocorrem quando os dados fornecidos pelo usuário são inseridos diretamente em uma consulta ou comando executado por um sistema. Isso pode acontecer em vários contextos, como a construção de uma consulta SQL dinâmica, a montagem de uma string de comandos em um sistema operacional, ou até mesmo a criação de uma consulta LDAP.</p>
+
+<p>O perigo reside no fato de que, se os dados do usuário não forem adequadamente tratados ou sanitizados, um invasor pode manipulá-los de forma maliciosa, inserindo caracteres especiais ou instruções que alteram o comportamento esperado do sistema. Isso pode levar a uma variedade de ataques, desde a recuperação não autorizada de informações confidenciais até a execução de comandos indesejados no sistema.</p>
+
+<p>É importante ressaltar que essas vulnerabilidades são especialmente prevalentes em cenários onde há concatenação de strings para formar consultas ou comandos. Esse método de construção de consultas é propenso a erros devido à natureza dinâmica e imprevisível dos dados fornecidos pelos usuários.</p>
+
+<p>Ao entender as vulnerabilidades de injeção de consultas e os riscos associados, os desenvolvedores podem adotar práticas seguras de codificação e implementar medidas de segurança adequadas para proteger seus sistemas contra essas ameaças.</p>
+
+<h3 id="exemplo-prático">Exemplo prático</h3>
+
+<p>Para este exemplo, vamos imaginar uma API usando Spring Boot onde ela recebe um objeto por meio do corpo da requisição. A classe abaixo representa a nosso controlador.</p>
+
+<script src="https://gist.github.com/httpmurilo/e7f29bfb97a7284b8ed1cc6fbec000be.js"></script>
+
+<p>Temos uma classe que representa a entidade do banco de dados, a classe <code class="language-plaintext highlighter-rouge">User</code> contém algumas propriedades que facilmente podemos achar em ambientes de produção, pré-prod, homologação e assim por diante.</p>
+
+<script src="https://gist.github.com/httpmurilo/85efcca52da7953b48a8f1f7046dbc75.js"></script>
+
+<p>No repositório, temos a seguinte lógica, onde recebemos o nome do usuário e realizamos a busca, a consulta foi montada em JHQL, nela incluímos uma concatenação desnecessária, o uso das <code class="language-plaintext highlighter-rouge">''</code> não é necessário pois o JPA consegue interpretar o valor <code class="language-plaintext highlighter-rouge">?1</code>:</p>
+
+<script src="https://gist.github.com/httpmurilo/f37551991cae80fb6479312c833ac470.js"></script>
+
+<p>Atualmente as informações são obtidas conforme request <code class="language-plaintext highlighter-rouge">http://localhost:8080/api/user/search?name=Pedro</code>, onde o critério de busca vem por meio da QueryString.</p>
+
+<p>Paralelamente, foi criado um console application onde injetará mais de mil string maliciosas:</p>
+
+<script src="https://gist.github.com/httpmurilo/e744e3b096d695e92c4253b33830d882.js"></script>
+
+<p>Após o teste de estresse, as consultas montadas mantiveram o padrão, de forma nativa o spring conseguiu sanitizar todos os ataques.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Hibernate:
+    /* dynamic native SQL query */ SELECT
+        *
+    FROM
+        User
+    WHERE
+        name = '?1'
+</code></p>
+
+<p>Vamos trocar uma ideia sobre esse comportamento;</p>
+
+<ul>
+  <li>
+    <p>Por padrão, o <code class="language-plaintext highlighter-rouge">tomcat-embed-core</code> já bloqueia cenários mínimos de ataques, com a mensagem <code class="language-plaintext highlighter-rouge">Invalid character found in the HTTP protocol [' ]</code>.</p>
+  </li>
+  <li>
+    <p>Ao usar o JpaRepository, as consultas são tratadas automaticamente para evitar vulnerabilidades de injeção de SQL. Significando que as consultas são parametrizadas por padrão.</p>
+  </li>
+</ul>
+
+<p>Em outras palavras, isso significa que os parâmetros são tratados separadamente da consulta SQL e não são concatenados diretamente na consulta. Assim protege contra a maioria dos ataques de injeção de SQL, pois os valores dos parâmetros não são interpretados como parte do comando SQL. A partir do momento que usamos ela, o Spring Data JPA já realiza esse tratamento para nós.</p>
+
+<ul>
+  <li>
+    <p>O tratamento automático introduziu essas funcionalidades de segurança desde suas primeiras versões, e desde então vem se aprimorando vide os bugs aberto pela comunidade (<code class="language-plaintext highlighter-rouge">https://spring.io/security/cve-2016-6652</code>).</p>
+  </li>
+  <li>
+    <p>Sobre o uso do @RequestParam no controladores Spring, ao não adotá-lo, a request vai bater no repositório como <code class="language-plaintext highlighter-rouge">'="or'</code>. A partir do momento que adotar o seu uso, o comportamento é o mesmo. Como uma alternativa, pode ser usado <code class="language-plaintext highlighter-rouge">StringEscapeUtils.escapeSql()</code> do pacote <code class="language-plaintext highlighter-rouge">Apache Commons Lang</code>. Pode ser consultado em <a href="https://mvnrepository.com/artifact/org.apache.commons/commons-lang3">commons-lang3</a>.</p>
+  </li>
+  <li>
+    <p>Sobre o uso do @Param em consultas JPA, honestamente, se voltarmos para o início da lista, veremos que ele não é obrigatório/necessário, creio que o uso dele visá tornar o código mais legível ou para manter uma consistência entre os diferentes métodos de consulta, fica a gosto do cliente o seu uso.</p>
+  </li>
+</ul>
+
+<h3 id="encerramento">Encerramento</h3>
+
+<p>A injeção de consultas, como a injeção de SQL, representa uma ameaça significativa à segurança das aplicações web. Essas falhas ocorrem quando dados não confiáveis são inseridos em um sistema e interpretados como parte de um comando ou consulta. Isso pode levar a ações não intencionadas, como acesso não autorizado a dados ou até mesmo corrupção de dados.</p>
+
+<p>No contexto do Spring Data JPA, descobrimos que o tratamento automático de consultas introduzido desde suas primeiras versões protege efetivamente contra a maioria dos ataques de injeção de SQL. Consultas parametrizadas são usadas por padrão, o que separa os parâmetros da consulta SQL e evita a interpretação de dados de entrada como parte do comando SQL.</p>
+
+<p>Em resumo, é crucial estar ciente das vulnerabilidades de injeção de consultas e implementar medidas adequadas para mitigar esses riscos, garantindo assim a segurança e integridade de suas aplicações web.</p>
+
+<h3 id="código-fonte">Código fonte</h3>
+
+<p>O código fonte está disponibilizado <a href="https://github.com/httpmurilo/basic-injection-example">aqui</a>.</p>
+
+<p>A lista de sql injection pode ser consulta <a href="https://gist.github.com/httpmurilo/4579669be1d2e562eb82a0b7e0fd8424">aqui</a>, deixando claro os seus créditos aos autores <a href="https://swisskyrepo.github.io/PayloadsAllTheThingsWeb/SQL%20Injection/">swissky</a> e <a href="https://github.com/payloadbox">payloadbox</a>.</p>
+
+            </div>
+
+            <!-- Rating -->
+            
+
+            <!-- Post Date -->
+            <p>
+            <small>
+                <span class="post-date"><time class="post-date" datetime="2024-04-02">02 Apr 2024</time></span>           
+                
+                </small>
+            </p>
+
+            <!-- Post Categories -->
+            <div class="after-post-cats">
+                <ul class="tags mb-4">
+                    
+                    
+                    <li>
+                        <a class="smoothscroll" href="/categories#owasp">owasp</a>
+                    </li>
+                    
+                    <li>
+                        <a class="smoothscroll" href="/categories#springboot">springboot</a>
+                    </li>
+                    
+                </ul>
+            </div>
+            <!-- End Categories -->
+
+            <!-- Post Tags -->
+            <div class="after-post-tags">
+                <ul class="tags">
+                    
+                    
+                </ul>
+            </div>
+            <!-- End Tags -->
+
+            <!-- Prev/Next -->
+            <div class="row PageNavigation d-flex justify-content-between font-weight-bold">
+            
+            <a class="prev d-block col-md-6" href="//mapstruct-criando-dto-de-forma-mais-elegante/"> &laquo; Map Struct - Criando objetos DTOs de forma mais elegante</a>
+            
+            
+            <div class="clearfix"></div>
+            </div>
+            <!-- End Categories -->
+
+        </div>
+        <!-- End Post -->
+
+    </div>
+</div>
+<!-- End Article
+================================================== -->
+
+<!-- Begin Comments
+================================================== -->
+
+    <div class="container">
+        <div id="comments" class="row justify-content-center mb-5">
+            <div class="col-md-8">
+                <section class="disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'demowebsite'; 
+        var disqus_developer = 0;
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = window.location.protocol + '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+            </div>
+        </div>
+    </div>
+
+<!--End Comments
+================================================== -->
+
+<!-- Review with LD-JSON, adapt it for your needs if you like, but make sure you test the generated HTML source code first: 
+https://search.google.com/structured-data/testing-tool/u/0/
+================================================== -->
+
+</div>
+
+
+    
+</div>
+
+<!-- Categories Jumbotron
+================================================== -->
+<div class="jumbotron fortags">
+	<div class="d-md-flex h-100">
+		<div class="col-md-4 transpdark align-self-center text-center h-100">
+            <div class="d-md-flex align-items-center justify-content-center h-100">
+                <h2 class="d-md-block align-self-center py-1 font-weight-light">Explorar <span class="d-none d-md-inline">→</span></h2>
+            </div>
+		</div>
+		<div class="col-md-8 p-5 align-self-center text-center">
+            
+            
+                
+                    <a class="mt-1 mb-1" href="/categories#springboot">springboot (3)</a>
+                
+                    <a class="mt-1 mb-1" href="/categories#annotations">annotations (1)</a>
+                
+                    <a class="mt-1 mb-1" href="/categories#mapstruct">mapstruct (1)</a>
+                
+                    <a class="mt-1 mb-1" href="/categories#dto">dto (1)</a>
+                
+                    <a class="mt-1 mb-1" href="/categories#owasp">owasp (1)</a>
+                
+            
+            
+		</div>
+	</div>
+</div>
+
+<!-- Begin Footer
+================================================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-6 text-center text-lg-left">
+                Copyright © 2024 Murilo Eduardo 
+            </div>
+            <div class="col-md-6 col-sm-6 text-center text-lg-right">    
+                <a target="_blank" href="https://www.wowthemes.net/mediumish-free-jekyll-template/">Mediumish Jekyll Theme</a> by WowThemes.net
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- End Footer
+================================================== -->
+
+</div> <!-- /.site-content -->
+
+<!-- Scripts
+================================================== -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+
+<script src="/assets/js/mediumish.js"></script>
+
+
+
+<script src="/assets/js/ie10-viewport-bug-workaround.js"></script> 
+
+
+<script id="dsq-count-scr" src="//demowebsite.disqus.com/count.js"></script>
+
+
+</body>
+</html>

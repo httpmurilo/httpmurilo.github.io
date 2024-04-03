@@ -6,27 +6,27 @@
 
 <link rel="icon" href="/assets/images/logo.png">
 
-<title>@RepositoryRestResource - Entendendo o uso dessa annotation | Murilo Eduardo</title>
+<title>Map Struct - Criando objetos DTOs de forma mais elegante | Murilo Eduardo</title>
 
 <!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>@RepositoryRestResource - Entendendo o uso dessa annotation | Blog</title>
+<title>Map Struct - Criando objetos DTOs de forma mais elegante | Blog</title>
 <meta name="generator" content="Jekyll v4.3.3" />
-<meta property="og:title" content="@RepositoryRestResource - Entendendo o uso dessa annotation" />
+<meta property="og:title" content="Map Struct - Criando objetos DTOs de forma mais elegante" />
 <meta name="author" content="murilo" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Neste artigo iremos trocar uma ideia sobre annotation @RepositoryRestResource, por meio dela podemos criar API HATEOAS em poucos minutos!" />
-<meta property="og:description" content="Neste artigo iremos trocar uma ideia sobre annotation @RepositoryRestResource, por meio dela podemos criar API HATEOAS em poucos minutos!" />
-<link rel="canonical" href="http://localhost:4000/repository-rest-resource/" />
-<meta property="og:url" content="http://localhost:4000/repository-rest-resource/" />
+<meta name="description" content="Neste artigo será apresentado a biblioteca Map Struct que permite criar objetos dtos e serializa-los de forma mais elegante, simples e prática." />
+<meta property="og:description" content="Neste artigo será apresentado a biblioteca Map Struct que permite criar objetos dtos e serializa-los de forma mais elegante, simples e prática." />
+<link rel="canonical" href="http://localhost:4000/mapstruct-criando-dto-de-forma-mais-elegante/" />
+<meta property="og:url" content="http://localhost:4000/mapstruct-criando-dto-de-forma-mais-elegante/" />
 <meta property="og:site_name" content="Blog" />
-<meta property="og:image" content="http://localhost:4000/assets/images/spring-boot-2.jpg" />
+<meta property="og:image" content="http://localhost:4000/assets/images/map-struct.png" />
 <meta property="og:type" content="article" />
-<meta property="article:published_time" content="2022-01-22T00:00:00-03:00" />
+<meta property="article:published_time" content="2022-02-11T00:00:00-03:00" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta property="twitter:image" content="http://localhost:4000/assets/images/spring-boot-2.jpg" />
-<meta property="twitter:title" content="@RepositoryRestResource - Entendendo o uso dessa annotation" />
+<meta property="twitter:image" content="http://localhost:4000/assets/images/map-struct.png" />
+<meta property="twitter:title" content="Map Struct - Criando objetos DTOs de forma mais elegante" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"murilo"},"dateModified":"2022-01-22T00:00:00-03:00","datePublished":"2022-01-22T00:00:00-03:00","description":"Neste artigo iremos trocar uma ideia sobre annotation @RepositoryRestResource, por meio dela podemos criar API HATEOAS em poucos minutos!","headline":"@RepositoryRestResource - Entendendo o uso dessa annotation","image":"http://localhost:4000/assets/images/spring-boot-2.jpg","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/repository-rest-resource/"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/logo.png"},"name":"murilo"},"url":"http://localhost:4000/repository-rest-resource/"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"murilo"},"dateModified":"2022-02-11T00:00:00-03:00","datePublished":"2022-02-11T00:00:00-03:00","description":"Neste artigo será apresentado a biblioteca Map Struct que permite criar objetos dtos e serializa-los de forma mais elegante, simples e prática.","headline":"Map Struct - Criando objetos DTOs de forma mais elegante","image":"http://localhost:4000/assets/images/map-struct.png","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/mapstruct-criando-dto-de-forma-mais-elegante/"},"publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/assets/images/logo.png"},"name":"murilo"},"url":"http://localhost:4000/mapstruct-criando-dto-de-forma-mais-elegante/"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -158,19 +158,19 @@
     </p>
     <ul>
         <li class="ml-1 mr-1">
-            <a target="_blank" href="https://twitter.com/intent/tweet?text=@RepositoryRestResource - Entendendo o uso dessa annotation&url=http://localhost:4000/repository-rest-resource/" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+            <a target="_blank" href="https://twitter.com/intent/tweet?text=Map Struct - Criando objetos DTOs de forma mais elegante&url=http://localhost:4000/mapstruct-criando-dto-de-forma-mais-elegante/" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
                 <i class="fab fa-twitter"></i>
             </a>
         </li>
 
         <li class="ml-1 mr-1">
-            <a target="_blank" href="https://facebook.com/sharer.php?u=http://localhost:4000/repository-rest-resource/" onclick="window.open(this.href, 'facebook-share', 'width=550,height=435');return false;">
+            <a target="_blank" href="https://facebook.com/sharer.php?u=http://localhost:4000/mapstruct-criando-dto-de-forma-mais-elegante/" onclick="window.open(this.href, 'facebook-share', 'width=550,height=435');return false;">
                 <i class="fab fa-facebook-f"></i>
             </a>
         </li>
 
         <li class="ml-1 mr-1">
-            <a target="_blank" href="https://www.linkedin.com/shareArticle?mini=true&url=http://localhost:4000/repository-rest-resource/" onclick="window.open(this.href, 'width=550,height=435');return false;">
+            <a target="_blank" href="https://www.linkedin.com/shareArticle?mini=true&url=http://localhost:4000/mapstruct-criando-dto-de-forma-mais-elegante/" onclick="window.open(this.href, 'width=550,height=435');return false;">
                 <i class="fab fa-linkedin-in"></i>
             </a>
         </li>
@@ -211,7 +211,7 @@
                 
 
                 <!-- Post Title -->
-                <h1 class="posttitle">@RepositoryRestResource - Entendendo o uso dessa annotation</h1>
+                <h1 class="posttitle">Map Struct - Criando objetos DTOs de forma mais elegante</h1>
 
             </div>
 
@@ -223,7 +223,7 @@
             
 
             
-            <img class="featured-image img-fluid" src="/assets/images/spring-boot-2.jpg" alt="@RepositoryRestResource - Entendendo o uso dessa annotation">
+            <img class="featured-image img-fluid" src="/assets/images/map-struct.png" alt="Map Struct - Criando objetos DTOs de forma mais elegante">
             
 
             
@@ -234,49 +234,69 @@
                 <!-- Toc if any -->
                 
                 <!-- End Toc -->
-                <p>Neste artigo iremos trocar uma ideia sobre annotation @RepositoryRestResource, por meio dela podemos criar API HATEOAS em poucos minutos!</p>
+                <p>Neste artigo será apresentado a biblioteca Map Struct que permite criar objetos dtos e serializa-los de forma mais elegante, simples e prática.</p>
 
-<p>Em um cenário comum, considerando uma aplicação Spring Boot, temos a nossa camada de repositório que no caso é uma interface que estenderia do JpaRepository, uma camada de serviço e no controlador e retornando algumas ações, nesse ponto nada fora do padrão.</p>
+<p>Data Transfer Object, comumente conhecido como DTO é um padrão de projetos muito utilizado em várias linguagens de programação. É destinado para o transporte de dados entre diferentes camadas do sistema. A proposta é possuir uma classe mais simples e leve para melhorar a comunicação e otimizar o processamento.</p>
 
-<h3 id="sobre-repositoryrestsource">Sobre @RepositoryRestSource</h3>
+<h3 id="sobre-sua-aplicabilidade">Sobre sua aplicabilidade</h3>
 
-<p>Na prática, o que  Spring fez aqui, é que permite que você exponha os seus endpoints por meio das suas interfaces (repositórios) são geralmente chamadas GET/POST/PUT e outros verbos HTTP para manipular a sua entidade. Uma das vantagens dessa annotation é que dispensa a necessidade de criar a camada de serviço e controladores. Uma das vantagens é que será criado seguindo a restrição HATEOAS, onde os clientes poderão facilmente consumir a sua API.</p>
-
-<p>Ao anotar a nossa interface de repositório com @RepositoryRestResource , precisamos informar mais dois parâmetros, sendo eles :</p>
-
-<p>A) Path : Indica qual o recurso importado, no nosso exemplo corresponderá ao path da aplicação, no nosso cenário/cliente</p>
+<p>O padrão DTO, resolver vários problemas, um deles é onde possuirmos o cadastro de uma entidade, mas algumas informações não necessariamente são obrigatórias ou necessárias, nesse caso, podemos criar uma classe secundária onde tenha os campos necessários e depois realizarmos a conversão/mapeamento para a entidade. Se procurarmos algum exemplo especificamente com Java, nos deparamos com os seguintes exemplos. Onde existe uma classe DTO e dentro dela, temos um construtor fazendo o de-para.</p>
 
 <h3 id="exemplo-prático">Exemplo prático</h3>
 
-<p>O modelo criado é referenciado como CustomerRepository e Customer, onde o CustomerRepository é composto por uma interface usando a annotation @RepositoryRestResource, conforme o exemplo abaixo:</p>
+<p>Para este exemplo, vamos imaginar que o nosso sistema é composto por uma tela de um sistema de cadastro de usuários, no módulo de cadastro de usuário, certos campos não são obrigatórios no envio da requisição. A classe abaixo representa a entidade User.</p>
 
-<script src="https://gist.github.com/httpmurilo/112ad35ce6ab5ddb869eacbb6bcafc73.js"></script>
+<script src="https://gist.github.com/httpmurilo/3a35ab40250072200914639e81b58498.js"></script>
 
-<p>A classe Customer representa o nosso modelo de negócio.</p>
+<p>Contudo, o sistema não necessita que no momento de criação seja informado o id do cliente e se o usuário está ativo ou não, para isso criamos um DTO, um objeto mais simples para representar o nosso cadastro. A classe abaixo representa o nosso UserDTO.</p>
 
-<script src="https://gist.github.com/httpmurilo/8e111550c19541e641ad6e9c57191607.js"></script>
+<script src="https://gist.github.com/httpmurilo/3e8ccddff78e2e0694d4152d743fd649.js"></script>
 
-<p>Ao subir a aplicação e acessar o path <code class="language-plaintext highlighter-rouge">localhost:8080/customer</code> nos deparamos com o seguinte retorno:</p>
+<p>Bom, na teoria, o nosso DTO está funcional e atendendo a necessidade de cadastro de usuários, mas em uma ensolarada manhã, a necessidade do cliente muda e o Product Owner chega na sua mesa informando que nesta tela, onde temos o cadastro de usuário torna-se necessário informar mais informações do cliente, como número do pedido, cidade e estado.</p>
 
-<script src="https://gist.github.com/httpmurilo/f6384c323a45cd978a05a20d7d027091.js"></script>
+<p>Agora temos um cenário onde toda e qualquer alteração precisa incrementar o nosso construtor <code class="language-plaintext highlighter-rouge">UserDTO convertToUser(User user)</code>. Nesse cenário, temos seis propriedades, até aí tudo bem. Mas se considerarmos, a tendência do software de ir mudando a necessidade da tela de cadastro de usuário ficará muito inviável manter esse construtor, pois ele não irá parar de crescer ferido o princípio SOLID Open-closed principle, onde define que uma entidade deverá estar aberta para extensão, mas fechada para modificação.</p>
 
-<p>E voilà em questão de minutos montamos a nossa API seguindo o padrão HATEOAS seguindo uma série de especificações, como, por exemplo a RFC 5988 que define como os links deverão ser implementados.</p>
+<script src="https://gist.github.com/httpmurilo/d296cc8f2f539541798aeb4ac827df40.js"></script>
 
-<p>Podemos confirmar o funcionamento de alguns endpoints pelos testes de integração abaixo:</p>
+<p>Nessa parte que entra a lib <code class="language-plaintext highlighter-rouge">MapStruct</code>, a proposta dela é simplificar a implementação de mapeamento entre tipos. É rápido, seguro e fácil de implementar e entender. A utilização e serialização de DTO/Entidades é simplificada com o uso dessa dependência.</p>
 
-<script src="https://gist.github.com/httpmurilo/43165e9b53292171def2aa7013e91b63.js"></script>
+<p>Para iniciar a implementação, é necessário importa-la ao projeto na <a href="https://mapstruct.org/documentation/installation/">documentação oficial</a> é demostrado essa inclusão;</p>
 
-<p>Usar essa categoria de abordagem possui uma série de benefícios para quem for utilizá-la, onde com poucas linhas de códigos poderá criar uma API, evita o trabalho de criar a camada de serviços e controladores além de permitir o desenvolvimento de testes de integração. Algumas desvantagens do uso dessa annotation é a falta de controle sobre a criação/retorno de status codes e headers.</p>
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="err">dependencies</span> <span class="err">{</span>
+    <span class="err">...</span>
+    <span class="err">implementation</span> <span class="err">'</span><span class="py">org.mapstruct</span><span class="p">:</span><span class="s">mapstruct:1.4.2.Final'</span>
+ 
+    <span class="err">annotationProcessor</span> <span class="err">'</span><span class="py">org.mapstruct</span><span class="p">:</span><span class="s">mapstruct-processor:1.4.2.Final'</span>
+<span class="err">}</span>
+
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<p>Uma abordagem que particularmente eu curto é a utilização de <code class="language-plaintext highlighter-rouge">static factory method</code> juntamente com uma classe <code class="language-plaintext highlighter-rouge">abstract</code>, onde a conversão ficaria da seguinte forma;</p>
+
+<script src="https://gist.github.com/httpmurilo/8d651463987e9cf73daf19af9940e8c1.js"></script>
+
+<p>Assim a nossa classe de serviço terá uma única instância do Mapper e a leitura fica bem mais agradável;</p>
+
+<script src="https://gist.github.com/httpmurilo/32b134fef6e8a29565dd8aee76720c5d.js"></script>
+
+<p>Essa implementação pode ser utilizada em várias camadas e tornará esse tipo de conversão muito fácil.</p>
 
 <h3 id="encerramento">Encerramento</h3>
 
-<p>Foi apresentado a annotation RepositoryRestResource, ela fornece a oportunidade de expormos facilmente os nossos endpoints usando somente a camada de repositório, evitando a criação dos Controllers. Você poderá avaliar o seu uso nos seus projetos para otimizar tempo e trabalho na criação de APIs.</p>
+<p>Foi apresentado a utilização do <code class="language-plaintext highlighter-rouge">MapStruct</code> para mapeamento de DTOs com o uso de <code class="language-plaintext highlighter-rouge">static factory method</code>. Com essa abordagem, se surgir a necessidade de aumentar as propriedades da nossa tela de cadastro basta incluir as propriedades nas classes <code class="language-plaintext highlighter-rouge">User</code> e <code class="language-plaintext highlighter-rouge">UserDTO</code>. O construtor que poderia se tornar um godzilla já não existe nessa cenário. Ficando mais limpa e prática.</p>
 
-<p>Ps. Ela é importada do pacote <code class="language-plaintext highlighter-rouge">spring-boot-starter-data-rest</code>.</p>
+<p>Na sequência, abordaremos um comparativo entre <code class="language-plaintext highlighter-rouge">MapStruct</code> e a biblioteca <code class="language-plaintext highlighter-rouge">ModelMapper</code>.</p>
 
 <h3 id="código-fonte">Código fonte</h3>
 
-<p>O código fonte está disponibilizado <a href="https://github.com/httpmurilo/artigo-repository-rest-resource">aqui</a>.</p>
+<p>O código fonte está disponibilizado <a href="https://github.com/httpmurilo/basic-map-struct">aqui</a>.</p>
 
             </div>
 
@@ -286,7 +306,7 @@
             <!-- Post Date -->
             <p>
             <small>
-                <span class="post-date"><time class="post-date" datetime="2022-01-22">22 Jan 2022</time></span>           
+                <span class="post-date"><time class="post-date" datetime="2022-02-11">11 Feb 2022</time></span>           
                 
                 </small>
             </p>
@@ -297,7 +317,11 @@
                     
                     
                     <li>
-                        <a class="smoothscroll" href="/categories#annotations">annotations</a>
+                        <a class="smoothscroll" href="/categories#dto">dto</a>
+                    </li>
+                    
+                    <li>
+                        <a class="smoothscroll" href="/categories#mapstruct">mapstruct</a>
                     </li>
                     
                     <li>
@@ -320,8 +344,10 @@
             <!-- Prev/Next -->
             <div class="row PageNavigation d-flex justify-content-between font-weight-bold">
             
+            <a class="prev d-block col-md-6" href="//repository-rest-resource/"> &laquo; @RepositoryRestResource - Entendendo o uso dessa annotation</a>
             
-            <a class="next d-block col-md-6 text-lg-right" href="//mapstruct-criando-dto-de-forma-mais-elegante/">Map Struct - Criando objetos DTOs de forma mais elegante &raquo; </a>
+            
+            <a class="next d-block col-md-6 text-lg-right" href="//owasp-spring-pratica/">Vulnerabilidade de injection de SQL no Spring &raquo; </a>
             
             <div class="clearfix"></div>
             </div>
